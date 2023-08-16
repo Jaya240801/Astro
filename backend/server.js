@@ -32,7 +32,7 @@ app.post('/create-transaction', async (req, res) => {
       secure: true
     },
     customer_details: {
-      email : 'test@gmail.com',
+      email : userEmail,
     }
   };
 

@@ -1,32 +1,30 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import axios from 'axios';
 import { Link, useNavigate } from "react-router-dom";
+import UserContext from "./UserContext";
 
 function LoginPage(passEmail) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
+    const {userEmail, setUserEmail} = useContext(UserContext);
 
     const navigate = useNavigate();
 
     const login = async () => {
         try {
             const response = await axios.post('http://localhost:8800/login', { email, password });
-            const simpanEmail = response.data.userEmail;
-
+            const dataEmail = response.data.userEmail
+            setUserEmail(dataEmail);
+            
             if (response.data.error) {
                 setMessage('Login failed');
             } else {
                 localStorage.setItem('isAuthenticated', 'true');
                 navigate("/home");
-                // console.log(simpanEmail)
+                // console.log(userEmail);
             }
-
-            if (simpanEmail) {
-                passEmail(simpanEmail);
-            }
-            console.log(passEmail(simpanEmail))
-            // setMessage(response.data.message);         
+      
         } catch (err) {
             console.error(err);
             setMessage('Login failed');
