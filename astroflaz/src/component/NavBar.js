@@ -31,10 +31,27 @@ function NavBar() {
           console.log('User closed the popup without finishing the payment');
         }
       });
+      handleOrder();
     } catch (error) {
       console.error('Failed to initiate payment:', error);
     }
   };
+
+  const handleOrder = async () => {
+    try {
+      const response = await axios.post('http://localhost:8800/save-order', {
+        id_order: "",
+        email: userEmail,
+        total_amount: totalAmount,
+        status: "pending",
+        orderDate: new Date().getTime(),
+        products: cart
+      });
+      console.log(response.data.message);
+    } catch (error) {
+      console.error('Failed to save order:', error);
+    }
+  }
 
   return (
     <div>

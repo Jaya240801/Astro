@@ -81,6 +81,42 @@ app.get('/product', (req, res) => {
   );
 });
 
+app.post('/save-order', (req, res) => {
+  const { id_order, email, total_amount, status, orderDate, products } = req.body;
+
+  connection.beginTransaction(function(err) {
+    if (err) throw err;
+
+    // Save to orders table
+    connection.query('INSERT INTO orders (email, total_price, status, order_date) VALUES (?, ?, ?, ?)', [email, total_amount, status, orderDate], (error, results) => {
+      if (error) {
+        return connection.rollback(function() {
+          throw error;
+        });
+      }
+
+      const orderDetails = products.map(product => [id_order, product.id_product, product.price_product]);
+
+      // Save to order_details table
+      connection.query('INSERT INTO order_detail (id_order, id_product, price_product) VALUES ?', [orderDetails], (error, results) => {
+        if (error) {
+          return connection.rollback(function() {
+            throw error;
+          });
+        }
+        connection.commit(function(err) {
+          if (err) {
+            return connection.rollback(function() {
+              throw err;
+            });
+          }
+          res.send({ message: 'Order saved successfully!' });
+        });
+      });
+    });
+  });
+});
+
 app.listen(8800, () => {
   console.log('Server running on port 8800');
 });
